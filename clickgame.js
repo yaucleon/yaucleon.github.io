@@ -6,18 +6,13 @@ const e = React.createElement;
 function Button(props){
   
     return e('button', 
-             {onClick: () => props.handleClick()}, 
+             {onClick: () => props.onClick()}, 
              'X'        
     );
   
 }
 
-function Square(props) {
-    return e('square',
-             {onClick: () => props.onClick()},
-            'X'
-    );
-}
+
 
 
 
@@ -25,7 +20,9 @@ class Board extends React.Component {
     
    
   renderButton(i) {
-    return Button(i);
+    return e(Button, {value: this.props.buttons[i],
+                     onClick: () => this.props.onClick(i)
+                     });
         
                 
   }
@@ -75,13 +72,18 @@ class ClickGame extends React.Component {
                     buttons: Array(9).fill(null)
                  };
   }
-    renderTimer(time) {
-      return 'Time: ' + time;
+    Timer() {
+      this.setState({time: this.state.time + 1});
   }
     handleClick(i) {
-   this.state.hit += 1;
+        
+        this.setState({ hit: this.state.hit + 1});
+        setInterval(this.Timer, 50);
    }
-    render() {
+    
+    
+        render() {
+            
         return (
       e(
   "div",
@@ -90,8 +92,8 @@ class ClickGame extends React.Component {
     "div",
     { className: "game-board" },
     e(Board, {
-      buttons: this.state.squares,
-      onClick: i => _this.handleClick(i)
+      buttons: this.state.buttons,
+      onClick: i => this.handleClick(i)
     })
   ),
   e(
@@ -100,25 +102,28 @@ class ClickGame extends React.Component {
     e(
       "div",
       null,
-      time
+      'Time: ' + this.state.time
     ),
     e(
       "div",
       null,
-      hit
+      'Hit: ' + this.state.hit
     ),
     e(
       "div",
       null,
-      miss
+      'Miss: ' + this.state.miss
     )
   )
-);
-            
+)
+           
     );
 
 
 }
+             
+    
+}
 
-//const domContainer = document.querySelector('#game_container');
-ReactDOM.render(e(ClickGame), document.getElementsById('root'));
+const domContainer = document.querySelector('#game_container');
+ReactDOM.render(e(ClickGame), domContainer);
