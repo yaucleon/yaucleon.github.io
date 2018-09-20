@@ -7,7 +7,8 @@ function Button(props){
   
     return e('button', 
              {onClick: () => props.onClick()}, 
-             'X'        
+             props.currState      
+                     
     );
   
 }
@@ -20,8 +21,10 @@ class Board extends React.Component {
     
    
   renderButton(i) {
+      
     return e(Button, {value: this.props.buttons[i],
-                     onClick: () => this.props.onClick(i)
+                     onClick: () => this.props.onClick(i),
+                      currState: i == this.props.num ? 'X' : 'O'
                      });
         
                 
@@ -69,16 +72,26 @@ class ClickGame extends React.Component {
     this.state = {  hit: 0,
                     miss: 0,
                     time: 0,
-                    buttons: Array(9).fill(null)
+                    buttons: Array(9).fill(''),
+                    num: 0
                  };
   }
+    Next() {
+        this.setState({num: Math.floor(Math.random() * 9)});
+        
+    }
     Timer() {
       this.setState({time: this.state.time + 1});
   }
     handleClick(i) {
-        
-        this.setState({ hit: this.state.hit + 1});
-        setInterval(this.Timer, 50);
+        if (i == this.state.num) {
+           this.setState({ hit: this.state.hit + 1});
+            this.Next();
+        }  
+        else {
+            this.setState({ miss: this.state.miss + 1});
+             }
+        //setInterval(this.Timer, 50);
    }
     
     
@@ -93,7 +106,8 @@ class ClickGame extends React.Component {
     { className: "game-board" },
     e(Board, {
       buttons: this.state.buttons,
-      onClick: i => this.handleClick(i)
+      onClick: i => this.handleClick(i),
+      num: this.state.num
     })
   ),
   e(
