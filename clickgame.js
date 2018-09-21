@@ -69,21 +69,40 @@ e(
 class ClickGame extends React.Component {
     constructor(props) {
     super(props);
-    this.state = {  hit: 0,
+    this.state = {  msg: 'Click any button to start!',
+                    hit: 0,
                     miss: 0,
-                    time: 0,
-                    buttons: Array(9).fill(''),
-                    num: 0
+                    time: 10,
+                    buttons: Array(9).fill(null),
+                    num: 0,
+                    gameover: false,
+                    gamestart: false,
+                    accuracy: 0
                  };
+        this.updateTimer = this.updateTimer.bind(this);
+        this.Tick = this.Tick.bind(this);
+    
   }
-    Next() {
-        this.setState({num: Math.floor(Math.random() * 9)});
-        
+    GameOver() {
+        this.setState({msg: 'Game Over!'});
+        this.setState({accuracy: ((this.state.hit / (this.state.hit + this.state.miss)) * 100).toFixed(1)});
     }
-    Timer() {
-      this.setState({time: this.state.time + 1});
-  }
+    
+    updateTimer() {
+        if (this.state.time > 0) {
+             this.setState({time: this.state.time - 1});   
+            }
+        else {
+            this.setState({gameover: true});
+            clearInterval(this.Timer);
+            this.GameOver();
+        }
+    }
     handleClick(i) {
+        if (!this.state.gameover && !this.state.gamestart) {
+            this.Start();
+        }
+        if (!this.state.gameover){
         if (i == this.state.num) {
            this.setState({ hit: this.state.hit + 1});
             this.Next();
@@ -91,8 +110,26 @@ class ClickGame extends React.Component {
         else {
             this.setState({ miss: this.state.miss + 1});
              }
-        //setInterval(this.Timer, 50);
+            
+        }
    }
+    
+    Tick() {
+        this.updateTimer();
+        
+    }
+    
+    Start() {
+        this.state.gamestart = true;
+        this.setState({msg: 'Game Start!'});
+        this.Timer = setInterval(this.Tick, 1000);
+    }
+    
+    Next() {
+        this.setState({num: Math.floor(Math.random() * 9)});
+        
+        
+    }
     
     
         render() {
@@ -113,6 +150,10 @@ class ClickGame extends React.Component {
   e(
     "div",
     { className: "game-info" },
+      e("div",
+        null,
+        this.state.msg
+       ),
     e(
       "div",
       null,
@@ -127,7 +168,11 @@ class ClickGame extends React.Component {
       "div",
       null,
       'Miss: ' + this.state.miss
-    )
+    ),
+    e(
+    "div",
+    null,
+    'Accuracy: ' + this.state.accuracy + '%')
   )
 )
            
@@ -135,7 +180,7 @@ class ClickGame extends React.Component {
 
 
 }
-             
+            
     
 }
 
